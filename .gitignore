@@ -21,3 +21,7 @@ coverage/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Package archive for distribution
+*.zip
+*.tar.gz
