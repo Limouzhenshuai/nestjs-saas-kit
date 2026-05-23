@@ -39,7 +39,10 @@ const mockSubscription = {
 };
 
 const mockCustomer = { id: 'cus_123' };
-const mockSession = { id: 'cs_123', url: 'https://checkout.stripe.com/session' };
+const mockSession = {
+  id: 'cs_123',
+  url: 'https://checkout.stripe.com/session',
+};
 
 describe('StripeService', () => {
   let service: StripeService;
@@ -66,7 +69,7 @@ describe('StripeService', () => {
     service = module.get<StripeService>(StripeService);
     stripeClient = mockStripe;
     prisma = mockPrisma;
-    configService = module.get(ConfigService) as jest.Mocked<ConfigService>;
+    configService = module.get(ConfigService);
 
     jest.clearAllMocks();
   });
@@ -113,7 +116,10 @@ describe('StripeService', () => {
       stripeClient.checkout.sessions.create.mockResolvedValue(mockSession);
 
       const result = await service.createCheckoutSession(
-        'cus_123', 'price_123', 'http://example.com/success', 'http://example.com/cancel',
+        'cus_123',
+        'price_123',
+        'http://example.com/success',
+        'http://example.com/cancel',
       );
 
       expect(stripeClient.checkout.sessions.create).toHaveBeenCalledWith({
@@ -133,7 +139,9 @@ describe('StripeService', () => {
 
       const result = await service.retrieveSubscription('sub_stripe_1');
 
-      expect(stripeClient.subscriptions.retrieve).toHaveBeenCalledWith('sub_stripe_1');
+      expect(stripeClient.subscriptions.retrieve).toHaveBeenCalledWith(
+        'sub_stripe_1',
+      );
       expect(result).toEqual(mockSubscription);
     });
   });
@@ -144,9 +152,12 @@ describe('StripeService', () => {
 
       const result = await service.cancelAtPeriodEnd('sub_stripe_1');
 
-      expect(stripeClient.subscriptions.update).toHaveBeenCalledWith('sub_stripe_1', {
-        cancel_at_period_end: true,
-      });
+      expect(stripeClient.subscriptions.update).toHaveBeenCalledWith(
+        'sub_stripe_1',
+        {
+          cancel_at_period_end: true,
+        },
+      );
       expect(result).toEqual(mockSubscription);
     });
   });
@@ -157,9 +168,12 @@ describe('StripeService', () => {
 
       const result = await service.reActivateSubscription('sub_stripe_1');
 
-      expect(stripeClient.subscriptions.update).toHaveBeenCalledWith('sub_stripe_1', {
-        cancel_at_period_end: false,
-      });
+      expect(stripeClient.subscriptions.update).toHaveBeenCalledWith(
+        'sub_stripe_1',
+        {
+          cancel_at_period_end: false,
+        },
+      );
       expect(result).toEqual(mockSubscription);
     });
   });
@@ -169,13 +183,21 @@ describe('StripeService', () => {
       stripeClient.subscriptions.retrieve.mockResolvedValue(mockSubscription);
       stripeClient.subscriptions.update.mockResolvedValue(mockSubscription);
 
-      const result = await service.updateSubscriptionPrice('sub_stripe_1', 'price_456');
+      const result = await service.updateSubscriptionPrice(
+        'sub_stripe_1',
+        'price_456',
+      );
 
-      expect(stripeClient.subscriptions.retrieve).toHaveBeenCalledWith('sub_stripe_1');
-      expect(stripeClient.subscriptions.update).toHaveBeenCalledWith('sub_stripe_1', {
-        items: [{ id: 'si_1', price: 'price_456' }],
-        proration_behavior: 'create_prorations',
-      });
+      expect(stripeClient.subscriptions.retrieve).toHaveBeenCalledWith(
+        'sub_stripe_1',
+      );
+      expect(stripeClient.subscriptions.update).toHaveBeenCalledWith(
+        'sub_stripe_1',
+        {
+          items: [{ id: 'si_1', price: 'price_456' }],
+          proration_behavior: 'create_prorations',
+        },
+      );
       expect(result).toEqual(mockSubscription);
     });
 
@@ -198,12 +220,15 @@ describe('StripeService', () => {
       configService.get.mockReturnValue('whsec_test');
 
       const result = service.constructWebhookEvent(
-        Buffer.from('{}'), 'test_sig',
+        Buffer.from('{}'),
+        'test_sig',
       );
 
       expect(configService.get).toHaveBeenCalledWith('STRIPE_WEBHOOK_SECRET');
       expect(stripeClient.webhooks.constructEvent).toHaveBeenCalledWith(
-        Buffer.from('{}'), 'test_sig', 'whsec_test',
+        Buffer.from('{}'),
+        'test_sig',
+        'whsec_test',
       );
       expect(result).toEqual(mockEvent);
     });
@@ -238,7 +263,11 @@ describe('StripeService', () => {
       stripeClient.customers.create.mockResolvedValue(mockCustomer);
       prisma.user.update.mockResolvedValue({} as any);
 
-      const result = await service.ensureCustomer('user_1', 'test@example.com', 'Test');
+      const result = await service.ensureCustomer(
+        'user_1',
+        'test@example.com',
+        'Test',
+      );
 
       expect(stripeClient.customers.create).toHaveBeenCalledWith({
         email: 'test@example.com',

@@ -38,7 +38,8 @@ export class StripeWebhookService {
     });
     if (!user) return;
 
-    const stripeSubscription = await this.stripeService.retrieveSubscription(subscriptionId);
+    const stripeSubscription =
+      await this.stripeService.retrieveSubscription(subscriptionId);
     const data = this.stripeService.extractSubscriptionData(stripeSubscription);
 
     await this.prisma.subscription.upsert({

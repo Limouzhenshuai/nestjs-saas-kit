@@ -10,6 +10,10 @@ A production-ready SaaS boilerplate built with **NestJS 11**, featuring JWT auth
 - **Subscription Management** — Create checkout, view current plan, cancel at period end, change plan mid-cycle
 - **Stripe Webhook Handling** — Signature verification in production, mock mode for local development
 - **API Security** — All subscription endpoints protected by `JwtAuthGuard`, webhook endpoint secured by Stripe signature
+- **Swagger Documentation** — Interactive API docs at `/api/docs`
+- **Health Check** — `GET /health` endpoint for deployment monitoring
+- **Docker Support** — Multi-stage Dockerfile + docker-compose with PostgreSQL and Redis
+- **Global Error Handling** — Unified error response format across all endpoints
 
 ## Tech Stack
 
@@ -33,6 +37,7 @@ src/
 │   ├── dto/            # RegisterDto, LoginDto, RefreshTokenDto
 │   ├── guards/         # JwtAuthGuard, LocalAuthGuard, RolesGuard
 │   └── strategies/     # JwtStrategy, LocalStrategy
+├── common/             # Shared filters (exception filter)
 ├── prisma/             # Prisma service + module
 ├── stripe/             # Stripe integration module
 │   ├── webhook/        # StripeWebhookController + StripeWebhookService
@@ -78,6 +83,9 @@ npm run start:dev
 ```
 
 The server starts at `http://localhost:3000`.
+
+**Swagger docs**: http://localhost:3000/api/docs
+**Health check**: `GET http://localhost:3000/health`
 
 ## Environment Variables
 
@@ -191,21 +199,13 @@ npm run test:e2e
 
 ### Docker
 
-```dockerfile
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
+```bash
+# Start all services (app + PostgreSQL + Redis)
+docker-compose up -d
 
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=build /app/dist ./dist
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/package.json ./
-EXPOSE 3000
-CMD ["node", "dist/main"]
+# Or build and run only the app (requires external database)
+docker build -t nestjs-saas-kit .
+docker run -p 3000:3000 --env-file .env nestjs-saas-kit
 ```
 
 ### Railway

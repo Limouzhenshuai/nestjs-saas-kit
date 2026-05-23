@@ -91,7 +91,9 @@ describe('Stripe + Subscription (e2e)', () => {
   describe('POST /subscriptions', () => {
     it('should create a checkout session and return URL', async () => {
       mockPrisma.user.findUnique.mockResolvedValue(mockUser);
-      mockStripeClient.customers.create.mockResolvedValue({ id: 'cus_test_123' });
+      mockStripeClient.customers.create.mockResolvedValue({
+        id: 'cus_test_123',
+      });
       mockStripeClient.checkout.sessions.create.mockResolvedValue({
         id: 'cs_test_123',
         url: 'https://checkout.stripe.com/session',
@@ -103,7 +105,10 @@ describe('Stripe + Subscription (e2e)', () => {
         .send({ priceId: 'price_test_1' })
         .expect(201);
 
-      expect(res.body).toHaveProperty('url', 'https://checkout.stripe.com/session');
+      expect(res.body).toHaveProperty(
+        'url',
+        'https://checkout.stripe.com/session',
+      );
       expect(res.body).toHaveProperty('sessionId', 'cs_test_123');
     });
 

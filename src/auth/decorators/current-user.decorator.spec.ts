@@ -56,7 +56,9 @@ describe('CurrentUser Decorator', () => {
   });
 
   it('should return the full user object when no data arg', () => {
-    setUser = { user: { sub: 'user_1', email: 'test@example.com', role: 'USER' } };
+    setUser = {
+      user: { sub: 'user_1', email: 'test@example.com', role: 'USER' },
+    };
     return request(app.getHttpServer())
       .get('/test/user')
       .expect(200)

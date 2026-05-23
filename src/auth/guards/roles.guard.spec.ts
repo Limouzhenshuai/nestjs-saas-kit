@@ -40,6 +40,8 @@ describe('RolesGuard', () => {
   it('should throw ForbiddenException when user lacks required role', () => {
     reflector.getAllAndOverride.mockReturnValue(['ADMIN']);
 
-    expect(() => guard.canActivate(mockContext('USER'))).toThrow(ForbiddenException);
+    expect(() => guard.canActivate(mockContext('USER'))).toThrow(
+      ForbiddenException,
+    );
   });
 });

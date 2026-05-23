@@ -62,7 +62,10 @@ export class SubscriptionService {
       throw new NotFoundException('No active subscription');
     }
 
-    await this.stripeService.updateSubscriptionPrice(subscription.stripeId, priceId);
+    await this.stripeService.updateSubscriptionPrice(
+      subscription.stripeId,
+      priceId,
+    );
 
     return this.prisma.subscription.update({
       where: { userId },

@@ -64,7 +64,7 @@ describe('AuthService', () => {
 
     service = module.get<AuthService>(AuthService);
     prisma = mockPrisma;
-    jwtService = module.get(JwtService) as jest.Mocked<JwtService>;
+    jwtService = module.get(JwtService);
 
     jest.clearAllMocks();
   });
@@ -73,7 +73,11 @@ describe('AuthService', () => {
   // register
   // -----------------------------------------------------------------------
   describe('register', () => {
-    const dto = { email: 'test@example.com', password: 'StrongPass1', name: 'Test User' };
+    const dto = {
+      email: 'test@example.com',
+      password: 'StrongPass1',
+      name: 'Test User',
+    };
 
     it('should register a new user and return sanitized user data', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
@@ -87,7 +91,11 @@ describe('AuthService', () => {
       });
       expect(bcrypt.hash).toHaveBeenCalledWith(dto.password, 12);
       expect(prisma.user.create).toHaveBeenCalledWith({
-        data: { email: dto.email, passwordHash: 'hashed-password', name: dto.name },
+        data: {
+          email: dto.email,
+          passwordHash: 'hashed-password',
+          name: dto.name,
+        },
       });
       expect(result).toEqual(sanitizedUser);
       expect(result).not.toHaveProperty('passwordHash');
@@ -117,7 +125,10 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      const result = await service.validateUser('test@example.com', 'wrong-password');
+      const result = await service.validateUser(
+        'test@example.com',
+        'wrong-password',
+      );
       expect(result).toBeNull();
     });
 
@@ -125,7 +136,10 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
-      const result = await service.validateUser('test@example.com', 'correct-password');
+      const result = await service.validateUser(
+        'test@example.com',
+        'correct-password',
+      );
       expect(result).toEqual(sanitizedUser);
       expect(result).not.toHaveProperty('passwordHash');
     });
@@ -192,21 +206,27 @@ describe('AuthService', () => {
         throw new Error('jwt malformed');
       });
 
-      await expect(service.refreshToken(token)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken(token)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException when user is not found', async () => {
       jwtService.verify.mockReturnValue(payload);
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.refreshToken(token)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken(token)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException when user has no refreshTokenHash', async () => {
       jwtService.verify.mockReturnValue(payload);
       prisma.user.findUnique.mockResolvedValue(mockUser);
 
-      await expect(service.refreshToken(token)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken(token)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should throw UnauthorizedException when token does not match stored hash', async () => {
@@ -214,7 +234,9 @@ describe('AuthService', () => {
       prisma.user.findUnique.mockResolvedValue(userWithHash);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.refreshToken(token)).rejects.toThrow(UnauthorizedException);
+      await expect(service.refreshToken(token)).rejects.toThrow(
+        UnauthorizedException,
+      );
     });
 
     it('should return new token pair on successful refresh', async () => {
@@ -227,7 +249,9 @@ describe('AuthService', () => {
 
       const result = await service.refreshToken(token);
 
-      expect(jwtService.verify).toHaveBeenCalledWith(token, { ignoreExpiration: true });
+      expect(jwtService.verify).toHaveBeenCalledWith(token, {
+        ignoreExpiration: true,
+      });
       expect(bcrypt.compare).toHaveBeenCalledWith(
         createHash('sha256').update(token).digest('hex'),
         'stored-hash',

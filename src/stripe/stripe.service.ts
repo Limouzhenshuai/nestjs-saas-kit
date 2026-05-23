@@ -53,8 +53,12 @@ export class StripeService {
     });
   }
 
-  async updateSubscriptionPrice(stripeSubscriptionId: string, newPriceId: string) {
-    const subscription = await this.stripe.subscriptions.retrieve(stripeSubscriptionId);
+  async updateSubscriptionPrice(
+    stripeSubscriptionId: string,
+    newPriceId: string,
+  ) {
+    const subscription =
+      await this.stripe.subscriptions.retrieve(stripeSubscriptionId);
     const itemId = subscription.items.data[0]?.id;
     if (!itemId) {
       throw new Error('No subscription items found');
@@ -73,7 +77,11 @@ export class StripeService {
     return this.stripe.webhooks.constructEvent(payload, signature, secret);
   }
 
-  async ensureCustomer(userId: string, email: string, name?: string): Promise<string> {
+  async ensureCustomer(
+    userId: string,
+    email: string,
+    name?: string,
+  ): Promise<string> {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (user?.stripeCustomerId) {
       return user.stripeCustomerId;

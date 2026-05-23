@@ -20,9 +20,7 @@ describe('AuthController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
-      providers: [
-        { provide: AuthService, useValue: authService },
-      ],
+      providers: [{ provide: AuthService, useValue: authService }],
     })
       .overrideGuard(LocalAuthGuard)
       .useValue({ canActivate: jest.fn(() => true) })
@@ -35,8 +33,20 @@ describe('AuthController', () => {
 
   describe('register', () => {
     it('should call authService.register', async () => {
-      const dto = { email: 'test@example.com', password: 'password123', name: 'Test' };
-      const result = { id: 'user_1', email: 'test@example.com', name: 'Test', role: 'USER', isActive: true, createdAt: new Date(), updatedAt: new Date() };
+      const dto = {
+        email: 'test@example.com',
+        password: 'password123',
+        name: 'Test',
+      };
+      const result = {
+        id: 'user_1',
+        email: 'test@example.com',
+        name: 'Test',
+        role: 'USER',
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
       authService.register.mockResolvedValue(result);
 
       const res = await controller.register(dto);

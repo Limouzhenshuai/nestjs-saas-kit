@@ -57,15 +57,20 @@ describe('Auth (e2e)', () => {
     process.env.JWT_EXPIRATION = '15m';
 
     // Push schema to SQLite test database
-    execSync('npx prisma db push --schema=prisma/schema.test.prisma --accept-data-loss', {
-      cwd: join(__dirname, '..'),
-      env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
-      stdio: 'pipe',
-    });
+    execSync(
+      'npx prisma db push --schema=prisma/schema.test.prisma --accept-data-loss',
+      {
+        cwd: join(__dirname, '..'),
+        env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL },
+        stdio: 'pipe',
+      },
+    );
 
     // Build the NestJS test module, overriding PrismaService with a SQLite client
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    const { PrismaClient: SqlitePrismaClient } = require('../node_modules/.prisma/test-client');
+
+    const {
+      PrismaClient: SqlitePrismaClient,
+    } = require('../node_modules/.prisma/test-client');
     const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
     const adapter = new PrismaBetterSqlite3({ url: `file:${DB_PATH}` });
     const sqlitePrisma = new SqlitePrismaClient({ adapter });
@@ -83,7 +88,7 @@ describe('Auth (e2e)', () => {
       controllers: [TestRbacController],
     })
       .overrideProvider(PrismaService)
-      .useValue(sqlitePrisma as any)
+      .useValue(sqlitePrisma)
       .compile();
 
     app = moduleFixture.createNestApplication();
@@ -231,9 +236,7 @@ describe('Auth (e2e)', () => {
     });
 
     it('should reject access without token (401)', async () => {
-      await request(app.getHttpServer())
-        .get('/test-rbac/user')
-        .expect(401);
+      await request(app.getHttpServer()).get('/test-rbac/user').expect(401);
     });
 
     it('should reject access with malformed token (401)', async () => {

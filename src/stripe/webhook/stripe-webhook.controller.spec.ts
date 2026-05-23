@@ -70,7 +70,10 @@ describe('StripeWebhookController', () => {
 
       await controller.handleWebhook(req, body, 'test_sig');
 
-      expect(stripeService.constructWebhookEvent).toHaveBeenCalledWith(rawBody, 'test_sig');
+      expect(stripeService.constructWebhookEvent).toHaveBeenCalledWith(
+        rawBody,
+        'test_sig',
+      );
       expect(stripeWebhookService.handleEvent).toHaveBeenCalledWith(
         'verified.event',
         { verified: true },

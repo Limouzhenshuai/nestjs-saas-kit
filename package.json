@@ -4,7 +4,15 @@
   "description": "Production-ready SaaS boilerplate with NestJS, Stripe subscriptions, JWT authentication, and RBAC",
   "author": "",
   "private": true,
-  "keywords": ["nestjs", "saas", "stripe", "authentication", "rbac", "prisma", "subscription"],
+  "keywords": [
+    "nestjs",
+    "saas",
+    "stripe",
+    "authentication",
+    "rbac",
+    "prisma",
+    "subscription"
+  ],
   "license": "MIT",
   "scripts": {
     "build": "nest build",
@@ -27,6 +35,7 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/swagger": "^11.4.4",
     "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",

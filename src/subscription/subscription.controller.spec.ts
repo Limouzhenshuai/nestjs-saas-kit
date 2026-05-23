@@ -32,12 +32,18 @@ describe('SubscriptionController', () => {
 
   describe('create', () => {
     it('should call service.create with priceId and user sub', async () => {
-      const result = { url: 'https://checkout.stripe.com/session', sessionId: 'cs_123' };
+      const result = {
+        url: 'https://checkout.stripe.com/session',
+        sessionId: 'cs_123',
+      };
       subscriptionService.create.mockResolvedValue(result);
 
       const res = await controller.create({ priceId: 'price_123' }, mockUser);
 
-      expect(subscriptionService.create).toHaveBeenCalledWith('price_123', 'user_1');
+      expect(subscriptionService.create).toHaveBeenCalledWith(
+        'price_123',
+        'user_1',
+      );
       expect(res).toEqual(result);
     });
   });
@@ -71,9 +77,15 @@ describe('SubscriptionController', () => {
       const result = { id: 'sub_1', priceId: 'price_456' };
       subscriptionService.changePlan.mockResolvedValue(result as any);
 
-      const res = await controller.changePlan({ priceId: 'price_456' }, mockUser);
+      const res = await controller.changePlan(
+        { priceId: 'price_456' },
+        mockUser,
+      );
 
-      expect(subscriptionService.changePlan).toHaveBeenCalledWith('price_456', 'user_1');
+      expect(subscriptionService.changePlan).toHaveBeenCalledWith(
+        'price_456',
+        'user_1',
+      );
       expect(res).toEqual(result);
     });
   });

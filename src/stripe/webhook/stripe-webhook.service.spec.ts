@@ -6,7 +6,11 @@ import { StripeService } from '../stripe.service';
 function createMockPrisma() {
   return {
     user: { findFirst: jest.fn() },
-    subscription: { findUnique: jest.fn(), upsert: jest.fn(), update: jest.fn() },
+    subscription: {
+      findUnique: jest.fn(),
+      upsert: jest.fn(),
+      update: jest.fn(),
+    },
   };
 }
 
@@ -57,8 +61,12 @@ describe('StripeWebhookService', () => {
         subscription: 'sub_stripe_1',
       };
       prisma.user.findFirst.mockResolvedValue({ id: 'user_1' });
-      stripeService.retrieveSubscription.mockResolvedValue({ id: 'sub_stripe_1' });
-      stripeService.extractSubscriptionData.mockReturnValue(mockSubscriptionData);
+      stripeService.retrieveSubscription.mockResolvedValue({
+        id: 'sub_stripe_1',
+      });
+      stripeService.extractSubscriptionData.mockReturnValue(
+        mockSubscriptionData,
+      );
       prisma.subscription.upsert.mockResolvedValue({} as any);
 
       await service.handleEvent('checkout.session.completed', session);
@@ -66,7 +74,9 @@ describe('StripeWebhookService', () => {
       expect(prisma.user.findFirst).toHaveBeenCalledWith({
         where: { stripeCustomerId: 'cus_123' },
       });
-      expect(stripeService.retrieveSubscription).toHaveBeenCalledWith('sub_stripe_1');
+      expect(stripeService.retrieveSubscription).toHaveBeenCalledWith(
+        'sub_stripe_1',
+      );
       expect(prisma.subscription.upsert).toHaveBeenCalledWith({
         where: { userId: 'user_1' },
         create: { userId: 'user_1', ...mockSubscriptionData },
@@ -75,7 +85,9 @@ describe('StripeWebhookService', () => {
     });
 
     it('should skip checkout.session.completed when no subscription ID', async () => {
-      await service.handleEvent('checkout.session.completed', { customer: 'cus_123' });
+      await service.handleEvent('checkout.session.completed', {
+        customer: 'cus_123',
+      });
 
       expect(prisma.user.findFirst).not.toHaveBeenCalled();
     });
@@ -94,7 +106,9 @@ describe('StripeWebhookService', () => {
     it('should handle customer.subscription.updated', async () => {
       const subscription = { id: 'sub_stripe_1', customer: 'cus_123' };
       prisma.user.findFirst.mockResolvedValue({ id: 'user_1' });
-      stripeService.extractSubscriptionData.mockReturnValue(mockSubscriptionData);
+      stripeService.extractSubscriptionData.mockReturnValue(
+        mockSubscriptionData,
+      );
       prisma.subscription.upsert.mockResolvedValue({} as any);
 
       await service.handleEvent('customer.subscription.updated', subscription);
@@ -113,7 +127,8 @@ describe('StripeWebhookService', () => {
       prisma.user.findFirst.mockResolvedValue(null);
 
       await service.handleEvent('customer.subscription.updated', {
-        id: 'sub_stripe_1', customer: 'cus_unknown',
+        id: 'sub_stripe_1',
+        customer: 'cus_unknown',
       });
 
       expect(prisma.subscription.upsert).not.toHaveBeenCalled();
@@ -136,7 +151,8 @@ describe('StripeWebhookService', () => {
       prisma.user.findFirst.mockResolvedValue(null);
 
       await service.handleEvent('customer.subscription.deleted', {
-        id: 'sub_stripe_1', customer: 'cus_unknown',
+        id: 'sub_stripe_1',
+        customer: 'cus_unknown',
       });
 
       expect(prisma.subscription.update).not.toHaveBeenCalled();
@@ -170,7 +186,9 @@ describe('StripeWebhookService', () => {
     it('should skip invoice.payment_failed when subscription not found in DB', async () => {
       prisma.subscription.findUnique.mockResolvedValue(null);
 
-      await service.handleEvent('invoice.payment_failed', { subscription: 'sub_unknown' });
+      await service.handleEvent('invoice.payment_failed', {
+        subscription: 'sub_unknown',
+      });
 
       expect(prisma.subscription.update).not.toHaveBeenCalled();
     });

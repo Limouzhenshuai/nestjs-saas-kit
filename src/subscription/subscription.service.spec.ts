@@ -76,28 +76,40 @@ describe('SubscriptionService', () => {
 
       const result = await service.create('price_123', 'user_1');
 
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { id: 'user_1' } });
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { id: 'user_1' },
+      });
       expect(stripeService.ensureCustomer).toHaveBeenCalledWith(
-        'user_1', 'test@example.com', 'Test User',
+        'user_1',
+        'test@example.com',
+        'Test User',
       );
       expect(stripeService.createCheckoutSession).toHaveBeenCalledWith(
-        'cus_123', 'price_123',
+        'cus_123',
+        'price_123',
         'http://localhost:3000/subscriptions/success',
         'http://localhost:3000/subscriptions/cancel',
       );
-      expect(result).toEqual({ url: 'https://checkout.stripe.com/session', sessionId: 'cs_123' });
+      expect(result).toEqual({
+        url: 'https://checkout.stripe.com/session',
+        sessionId: 'cs_123',
+      });
     });
 
     it('should use CLIENT_URL from env when available', async () => {
       process.env.CLIENT_URL = 'https://myapp.com';
       prisma.user.findUnique.mockResolvedValue(mockUser);
       stripeService.ensureCustomer.mockResolvedValue('cus_123');
-      stripeService.createCheckoutSession.mockResolvedValue({ id: 'cs_123', url: 'https://checkout.stripe.com/session' });
+      stripeService.createCheckoutSession.mockResolvedValue({
+        id: 'cs_123',
+        url: 'https://checkout.stripe.com/session',
+      });
 
       await service.create('price_123', 'user_1');
 
       expect(stripeService.createCheckoutSession).toHaveBeenCalledWith(
-        'cus_123', 'price_123',
+        'cus_123',
+        'price_123',
         'https://myapp.com/subscriptions/success',
         'https://myapp.com/subscriptions/cancel',
       );
@@ -107,7 +119,9 @@ describe('SubscriptionService', () => {
     it('should throw NotFoundException when user is not found', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.create('price_123', 'user_1')).rejects.toThrow(NotFoundException);
+      await expect(service.create('price_123', 'user_1')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(stripeService.ensureCustomer).not.toHaveBeenCalled();
     });
   });
@@ -121,7 +135,9 @@ describe('SubscriptionService', () => {
 
       const result = await service.getCurrent('user_1');
 
-      expect(prisma.subscription.findUnique).toHaveBeenCalledWith({ where: { userId: 'user_1' } });
+      expect(prisma.subscription.findUnique).toHaveBeenCalledWith({
+        where: { userId: 'user_1' },
+      });
       expect(result).toEqual(mockSubscription);
     });
 
@@ -141,11 +157,16 @@ describe('SubscriptionService', () => {
     it('should cancel subscription at period end', async () => {
       prisma.subscription.findUnique.mockResolvedValue(mockSubscription);
       stripeService.cancelAtPeriodEnd.mockResolvedValue({} as any);
-      prisma.subscription.update.mockResolvedValue({ ...mockSubscription, cancelAtPeriodEnd: true });
+      prisma.subscription.update.mockResolvedValue({
+        ...mockSubscription,
+        cancelAtPeriodEnd: true,
+      });
 
       const result = await service.cancel('user_1');
 
-      expect(stripeService.cancelAtPeriodEnd).toHaveBeenCalledWith('sub_stripe_1');
+      expect(stripeService.cancelAtPeriodEnd).toHaveBeenCalledWith(
+        'sub_stripe_1',
+      );
       expect(prisma.subscription.update).toHaveBeenCalledWith({
         where: { userId: 'user_1' },
         data: { cancelAtPeriodEnd: true },
@@ -168,11 +189,17 @@ describe('SubscriptionService', () => {
     it('should change the subscription price plan', async () => {
       prisma.subscription.findUnique.mockResolvedValue(mockSubscription);
       stripeService.updateSubscriptionPrice.mockResolvedValue({} as any);
-      prisma.subscription.update.mockResolvedValue({ ...mockSubscription, priceId: 'price_456' });
+      prisma.subscription.update.mockResolvedValue({
+        ...mockSubscription,
+        priceId: 'price_456',
+      });
 
       const result = await service.changePlan('price_456', 'user_1');
 
-      expect(stripeService.updateSubscriptionPrice).toHaveBeenCalledWith('sub_stripe_1', 'price_456');
+      expect(stripeService.updateSubscriptionPrice).toHaveBeenCalledWith(
+        'sub_stripe_1',
+        'price_456',
+      );
       expect(prisma.subscription.update).toHaveBeenCalledWith({
         where: { userId: 'user_1' },
         data: { priceId: 'price_456' },
@@ -183,7 +210,9 @@ describe('SubscriptionService', () => {
     it('should throw NotFoundException when no active subscription', async () => {
       prisma.subscription.findUnique.mockResolvedValue(null);
 
-      await expect(service.changePlan('price_456', 'user_1')).rejects.toThrow(NotFoundException);
+      await expect(service.changePlan('price_456', 'user_1')).rejects.toThrow(
+        NotFoundException,
+      );
       expect(stripeService.updateSubscriptionPrice).not.toHaveBeenCalled();
     });
   });

@@ -31,10 +31,7 @@ export class StripeWebhookController {
     if (signature && process.env.STRIPE_WEBHOOK_SECRET) {
       try {
         const rawBody = (req as any).rawBody ?? JSON.stringify(body);
-        event = this.stripeService.constructWebhookEvent(
-          rawBody,
-          signature,
-        ) as any;
+        event = this.stripeService.constructWebhookEvent(rawBody, signature);
       } catch {
         throw new BadRequestException('Invalid webhook signature');
       }
