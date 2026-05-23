@@ -20,8 +20,8 @@ describe('JwtStrategy', () => {
   });
 
   describe('validate', () => {
-    it('should return user object from payload', async () => {
-      const result = await strategy.validate({
+    it('should return user object from payload', () => {
+      const result = strategy.validate({
         sub: 'user_1',
         email: 'test@example.com',
         role: 'USER',

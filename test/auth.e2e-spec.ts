@@ -68,10 +68,10 @@ describe('Auth (e2e)', () => {
 
     // Build the NestJS test module, overriding PrismaService with a SQLite client
 
-    const {
-      PrismaClient: SqlitePrismaClient,
-    } = require('../node_modules/.prisma/test-client');
-    const { PrismaBetterSqlite3 } = require('@prisma/adapter-better-sqlite3');
+    const { PrismaClient: SqlitePrismaClient } =
+      await import('../node_modules/.prisma/test-client');
+    const { PrismaBetterSqlite3 } =
+      await import('@prisma/adapter-better-sqlite3');
     const adapter = new PrismaBetterSqlite3({ url: `file:${DB_PATH}` });
     const sqlitePrisma = new SqlitePrismaClient({ adapter });
     await sqlitePrisma.$connect();
