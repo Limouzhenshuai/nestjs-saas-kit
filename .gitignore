@@ -1,0 +1,23 @@
+node_modules
+
+# Keep environment variables out of version control
+.env
+.env.test
+
+# SQLite test database
+*.db
+*.db-journal
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Prisma generated clients
+generated/
+
+# Test coverage reports
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
