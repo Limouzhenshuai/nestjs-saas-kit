@@ -40,7 +40,7 @@ export class StripeWebhookService {
 
     const stripeSubscription =
       await this.stripeService.retrieveSubscription(subscriptionId);
-    const data = this.stripeService.extractSubscriptionData(stripeSubscription);
+    const data = this.stripeService.extractSubscriptionData(stripeSubscription as any);
 
     await this.prisma.subscription.upsert({
       where: { userId: user.id },

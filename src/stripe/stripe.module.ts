@@ -15,7 +15,11 @@ import { PrismaModule } from '../prisma/prisma.module';
     {
       provide: STRIPE_CLIENT,
       useFactory: (configService: ConfigService) => {
-        return new Stripe(configService.get<string>('STRIPE_SECRET_KEY')!);
+        const key = configService.get<string>('STRIPE_SECRET_KEY');
+        if (!key) {
+          throw new Error('STRIPE_SECRET_KEY environment variable is required');
+        }
+        return new Stripe(key);
       },
       inject: [ConfigService],
     },

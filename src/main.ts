@@ -1,3 +1,4 @@
+import helmet from 'helmet';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -7,8 +8,16 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // CORS — restrict origin in production
-  app.enableCors();
+  // Security headers
+  app.use(helmet());
+
+  // CORS — restrict origin in production via CORS_ORIGIN env var
+  const corsOrigin = process.env.CORS_ORIGIN;
+  app.enableCors(
+    corsOrigin
+      ? { origin: corsOrigin.split(','), credentials: true }
+      : undefined,
+  );
 
   // Global validation — strips unknown fields and transforms types
   app.useGlobalPipes(

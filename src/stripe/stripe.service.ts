@@ -1,10 +1,19 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import Stripe from 'stripe';
 import { STRIPE_CLIENT } from './stripe.constants';
 import { PrismaService } from '../prisma/prisma.service';
 
-type StripeClient = any;
-type StripeSubscription = any;
+type StripeClient = InstanceType<typeof Stripe>;
+
+interface SubscriptionData {
+  id: string;
+  status: string;
+  items: { data: Array<{ price: { id: string } }> };
+  current_period_start: number;
+  current_period_end: number;
+  cancel_at_period_end: boolean;
+}
 
 @Injectable()
 export class StripeService {
@@ -94,7 +103,7 @@ export class StripeService {
     return customer.id;
   }
 
-  extractSubscriptionData(subscription: StripeSubscription) {
+  extractSubscriptionData(subscription: SubscriptionData) {
     return {
       stripeId: subscription.id,
       status: subscription.status,

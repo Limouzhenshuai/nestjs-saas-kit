@@ -29,7 +29,9 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Login with email and password' })
-  async login(@CurrentUser() user: any) {
+  async login(
+    @CurrentUser() user: { id?: string; sub?: string; email: string; role: string },
+  ) {
     return this.authService.login(user);
   }
 
@@ -45,7 +47,9 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Logout and invalidate refresh token' })
-  async logout(@CurrentUser() user: any) {
+  async logout(
+    @CurrentUser() user: { sub: string; email: string; role: string },
+  ) {
     await this.authService.logout(user.sub);
   }
 }

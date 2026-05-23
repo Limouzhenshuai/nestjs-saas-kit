@@ -66,7 +66,7 @@ describe('StripeWebhookController', () => {
       stripeService.constructWebhookEvent.mockReturnValue({
         type: 'verified.event',
         data: { object: { verified: true } },
-      });
+      } as any);
 
       await controller.handleWebhook(req, body, 'test_sig');
 
@@ -88,7 +88,7 @@ describe('StripeWebhookController', () => {
       stripeService.constructWebhookEvent.mockReturnValue({
         type: 'verified.event',
         data: { object: {} },
-      });
+      } as any);
 
       await controller.handleWebhook(req, body, 'test_sig');
 
